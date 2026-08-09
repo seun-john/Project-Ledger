@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+release/
+*.tsbuildinfo
+next-env.d.ts
+
+# Local SQLite database — may contain real client data; never commit it
+prisma/*.db
+prisma/*.db-journal
+
+.env
+.env*.local
+.DS_Store

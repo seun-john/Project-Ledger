@@ -1,0 +1,40 @@
+{
+  "name": "project-ledger",
+  "version": "1.0.0",
+  "description": "A local-first, white-label project pipeline with deadline and payment tracking.",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "setup": "prisma generate && prisma db push && prisma db seed",
+    "db:push": "prisma db push",
+    "db:seed": "prisma db seed",
+    "db:seed:demo": "prisma db seed -- --demo",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma db push --force-reset && prisma db seed"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.7.0",
+    "next": "^15.3.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "prisma": "^6.7.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  }
+}

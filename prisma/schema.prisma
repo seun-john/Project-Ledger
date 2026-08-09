@@ -1,0 +1,71 @@
+// Project Ledger — local-first data model.
+//
+// Money is stored in configurable integer minor units so sums and balances are
+// exact. SQLite has no true decimal type, and floating-point values would drift.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AppSettings {
+  id                 String   @id @default("default")
+  companyName        String   @default("Your Company")
+  logoSrc            String   @default("")
+  currencyCode       String   @default("USD")
+  currencySymbol     String   @default("$")
+  minorUnitsPerMajor Int      @default(100)
+  fractionDigits     Int      @default(2)
+  onboardingComplete Boolean  @default(false)
+  updatedAt          DateTime @updatedAt
+}
+
+model Stage {
+  id       String    @id @default(uuid())
+  ownerId  String?
+  name     String
+  position Int
+  projects Project[]
+
+  @@unique([ownerId, name])
+  @@index([ownerId, position])
+}
+
+model Project {
+  id            String    @id @default(uuid())
+  ownerId       String?
+  clientName    String
+  clientContact String?
+  projectTitle  String
+  serviceType   String
+  stageId       String
+  stage         Stage     @relation(fields: [stageId], references: [id])
+  totalFeeMinor Int       @default(0)
+  startDate     DateTime?
+  nextDeadline  DateTime?
+  defenceDate   DateTime?
+  notes         String    @default("")
+  payments      Payment[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([ownerId])
+  @@index([stageId])
+}
+
+model Payment {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  amountMinor Int
+  date        DateTime
+  method      String
+  note        String   @default("")
+  createdAt   DateTime @default(now())
+
+  @@index([projectId])
+}
