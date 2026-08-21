@@ -3,8 +3,6 @@
    :root (light default) → prefers-color-scheme:dark → [data-theme] overrides,
    so a manual choice always beats the OS preference. */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600&display=swap");
-
 :root {
   color-scheme: light dark;
   --bg: #fcfbf8;
@@ -21,12 +19,18 @@
   --accent-blue-wash: #edf4fa;
   --success: #1e7b4f;
   --error: #b3261e;
+  --on-accent: #241505;
+  --on-error: #ffffff;
+  --accent-soft: #fbeedd;
+  --border-input: #7f93a3;
+  --metric-alert: #b3261e;
+  --metric-warn: #a75911;
   --shadow-card: 0 1px 3px rgb(18 42 66 / 0.08);
   --overlay: rgb(18 42 66 / 0.35);
   --status-ok-bg: #edf4fa;
   --status-ok-text: #2d6fa3;
   --status-risk-bg: #fbeedd;
-  --status-risk-text: #b96313;
+  --status-risk-text: #a75911;
   --status-overdue-bg: #f7e2e0;
   --status-overdue-text: #b3261e;
   --status-done-bg: #eef1f4;
@@ -38,8 +42,10 @@
   --pay-paid-bg: #eaf3ec;
   --pay-paid-text: #1e7b4f;
 
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-serif: "Lora", Georgia, serif;
+  /* Supplied by next/font in layout.tsx — self-hosted, so they resolve with
+     no network. The stack after each is the offline/first-paint fallback. */
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: var(--font-lora), Georgia, "Times New Roman", serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -58,6 +64,12 @@
     --accent-blue-wash: rgba(79, 168, 216, 0.14);
     --success: #4cbe85;
     --error: #e5726b;
+  --on-accent: #1a1206;
+  --on-error: #3d0907;
+  --accent-soft: rgba(224, 138, 52, 0.16);
+  --border-input: #6b86a1;
+  --metric-alert: #e5726b;
+  --metric-warn: #e08a34;
     --shadow-card: 0 1px 3px rgb(0 0 0 / 0.4);
     --overlay: rgb(6 12 20 / 0.55);
     --status-ok-bg: rgba(79, 168, 216, 0.16);
@@ -93,12 +105,18 @@
   --accent-blue-wash: #edf4fa;
   --success: #1e7b4f;
   --error: #b3261e;
+  --on-accent: #241505;
+  --on-error: #ffffff;
+  --accent-soft: #fbeedd;
+  --border-input: #7f93a3;
+  --metric-alert: #b3261e;
+  --metric-warn: #a75911;
   --shadow-card: 0 1px 3px rgb(18 42 66 / 0.08);
   --overlay: rgb(18 42 66 / 0.35);
   --status-ok-bg: #edf4fa;
   --status-ok-text: #2d6fa3;
   --status-risk-bg: #fbeedd;
-  --status-risk-text: #b96313;
+  --status-risk-text: #a75911;
   --status-overdue-bg: #f7e2e0;
   --status-overdue-text: #b3261e;
   --status-done-bg: #eef1f4;
@@ -127,6 +145,12 @@
   --accent-blue-wash: rgba(79, 168, 216, 0.14);
   --success: #4cbe85;
   --error: #e5726b;
+  --on-accent: #1a1206;
+  --on-error: #3d0907;
+  --accent-soft: rgba(224, 138, 52, 0.16);
+  --border-input: #6b86a1;
+  --metric-alert: #e5726b;
+  --metric-warn: #e08a34;
   --shadow-card: 0 1px 3px rgb(0 0 0 / 0.4);
   --overlay: rgb(6 12 20 / 0.55);
   --status-ok-bg: rgba(79, 168, 216, 0.16);
@@ -281,8 +305,8 @@ a:hover {
 .brand-logo--fallback {
   min-width: 38px;
   justify-content: center;
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
   font-weight: 800;
   letter-spacing: 0.04em;
 }
@@ -386,7 +410,7 @@ a.btn-outline:hover {
   padding: 10px 20px;
   border: none;
   background: var(--accent);
-  color: #ffffff;
+  color: var(--on-accent);
   font-size: 14px;
 }
 
@@ -436,7 +460,7 @@ a.btn-outline:hover {
   padding: 9px 15px;
   border: none;
   background: var(--error);
-  color: #ffffff;
+  color: var(--on-error);
   font-size: 13px;
 }
 
@@ -580,7 +604,7 @@ a.btn-outline:hover {
 .select,
 .textarea {
   padding: 9px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   background: var(--surface);
   color: var(--text-body);
@@ -1381,4 +1405,125 @@ a.btn-outline:hover {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ---------- metric emphasis ---------- */
+
+/* All four cards used to look identical, so "Overdue: 3" read with exactly the
+   same weight as "Active projects: 12". The rail and value colour only switch
+   on when the number is actually non-zero — a calm board stays calm. */
+.metric-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card--alert::before,
+.metric-card--warn::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  border-radius: 12px 0 0 12px;
+}
+
+.metric-card--alert::before {
+  background: var(--metric-alert);
+}
+
+.metric-card--warn::before {
+  background: var(--metric-warn);
+}
+
+.metric-card--alert .metric-value {
+  color: var(--metric-alert);
+}
+
+.metric-card--warn .metric-value {
+  color: var(--metric-warn);
+}
+
+/* ---------- table interaction ---------- */
+
+/* Long pipelines scroll past the column names, so the header sticks to the top
+   of its own scroll box rather than the page — no dependency on the height of
+   the app header above it. */
+.table-wrap {
+  max-height: calc(100vh - 290px);
+  overflow: auto;
+}
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+}
+
+/* The row is still a <tr> so the table keeps its semantics; the button in the
+   first cell is what makes the row reachable and operable from the keyboard.
+   Clicking anywhere on the row works too, for the mouse. */
+.row-open {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-heading);
+  cursor: pointer;
+  text-align: left;
+}
+
+.row-open::after {
+  /* Stretches the hit area over the whole row without nesting the other cells
+     inside the button, which would be invalid table markup. */
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.data-table tbody tr {
+  position: relative;
+}
+
+.data-table tbody tr:focus-within {
+  background: var(--surface-2);
+}
+
+.row-open:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.th-sort:hover {
+  color: var(--text-heading);
+}
+
+/* ---------- stage picker ---------- */
+
+.stage-move {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stage-move .select {
+  font-weight: 600;
+  color: var(--text-heading);
 }

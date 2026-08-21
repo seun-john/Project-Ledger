@@ -1,7 +1,8 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useDialogFocus } from "@/lib/useDialogFocus";
 import type { AppSettingsDTO, StageDTO } from "@/lib/types";
 import type { SettingsPayload } from "@/lib/client/api-client";
 
@@ -20,6 +21,9 @@ interface Props {
 }
 
 export function SettingsModal({ settings, stages, required, onSave, onClose }: Props) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(panelRef);
+
   const [companyName, setCompanyName] = useState(settings.companyName);
   const [logoSrc, setLogoSrc] = useState(settings.logoSrc);
   const [currencyCode, setCurrencyCode] = useState(settings.currency.code);
@@ -144,7 +148,14 @@ export function SettingsModal({ settings, stages, required, onSave, onClose }: P
   };
 
   return (
-    <div className="modal modal--settings" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div
+      ref={panelRef}
+      tabIndex={-1}
+      className="modal modal--settings"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-title"
+    >
       <div className="modal-head">
         <div>
           <div className="modal-title" id="settings-title">

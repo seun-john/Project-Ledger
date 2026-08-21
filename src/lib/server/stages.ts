@@ -34,9 +34,25 @@ export async function listStages(): Promise<StageDTO[]> {
   });
 
   if (stages.length === 0) {
-    await prisma.stage.createMany({
-      data: TRACKER_CONFIG.defaultStages.map((name, position) => ({ ...scope, name, position })),
+    // Two server-side callers reach this line at once on a cold start (the
+    // layout's generateMetadata and the page render both load settings/stages),
+    // and this is a check-then-insert. @@unique([ownerId, name]) does not save
+    // us: ownerId is NULL in the single-user desktop build, and SQL never treats
+    // NULL as equal to NULL, so the constraint matches nothing and every caller
+    // inserts its own full set of stages. That is how a fresh database ends up
+    // with the default pipeline two or three times over.
+    //
+    // Re-checking inside a transaction closes it — SQLite serialises write
+    // transactions, so whoever arrives second sees the first one's rows.
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.stage.count({ where: scope });
+      if (existing > 0) return;
+
+      await tx.stage.createMany({
+        data: TRACKER_CONFIG.defaultStages.map((name, position) => ({ ...scope, name, position })),
+      });
     });
+
     stages = await prisma.stage.findMany({
       where: scope,
       orderBy: { position: "asc" },

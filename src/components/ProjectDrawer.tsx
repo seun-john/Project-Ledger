@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { TRACKER_CONFIG } from "@/config/tracker.config";
 import { moneyInputStep } from "@/lib/money";
 import { OverpaidBadge, PaymentBadge, StatusBadge } from "@/components/Badges";
-import type { CurrencySettings, ProjectDTO } from "@/lib/types";
+import { useDialogFocus } from "@/lib/useDialogFocus";
+import type { CurrencySettings, ProjectDTO, StageDTO } from "@/lib/types";
 
 interface PaymentDraft {
   amount: number;
@@ -15,12 +16,13 @@ interface PaymentDraft {
 
 interface Props {
   project: ProjectDTO;
+  stages: StageDTO[];
   currency: CurrencySettings;
   busy: boolean;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onMoveNext: () => void;
+  onMoveToStage: (stageId: string) => void;
   onAddPayment: (payment: PaymentDraft) => Promise<boolean>;
   onDeletePayment: (paymentId: string) => Promise<boolean>;
   onSaveNotes: (notes: string) => Promise<boolean>;
@@ -35,12 +37,13 @@ function todayInputValue(): string {
 
 export function ProjectDrawer({
   project,
+  stages,
   currency,
   busy,
   onClose,
   onEdit,
   onDelete,
-  onMoveNext,
+  onMoveToStage,
   onAddPayment,
   onDeletePayment,
   onSaveNotes,
@@ -53,6 +56,9 @@ export function ProjectDrawer({
 
   // Notes are a local draft while typing and saved on blur; the server value
   // wins whenever a different project is opened.
+  const panelRef = useRef<HTMLElement>(null);
+  useDialogFocus(panelRef);
+
   const notesBaseline = useRef(project.notes);
   useEffect(() => {
     setNotes(project.notes);
@@ -92,7 +98,14 @@ export function ProjectDrawer({
   };
 
   return (
-    <aside className="drawer" role="dialog" aria-modal="true" aria-label={`${project.clientName} — project detail`}>
+    <aside
+      ref={panelRef}
+      tabIndex={-1}
+      className="drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${project.clientName} — project detail`}
+    >
       <div className="drawer-head">
         <div>
           <div className="drawer-title">{project.clientName}</div>
@@ -109,10 +122,6 @@ export function ProjectDrawer({
             <div>
               <div className="detail-label">Service type</div>
               <div className="detail-value">{project.serviceType}</div>
-            </div>
-            <div>
-              <div className="detail-label">Stage</div>
-              <div className="detail-value">{project.stageName}</div>
             </div>
             <div>
               <div className="detail-label">Start date</div>
@@ -140,13 +149,37 @@ export function ProjectDrawer({
           ) : null}
         </div>
 
-        {project.nextStageId ? (
-          <button type="button" className="btn-stage-next" onClick={onMoveNext} disabled={busy}>
-            Move to {project.nextStageName} →
-          </button>
-        ) : (
-          <div className="hint hint--center">This project is complete.</div>
-        )}
+        <div className="stage-move">
+          <label className="detail-label" htmlFor="drawer-stage">
+            Stage
+          </label>
+          <select
+            id="drawer-stage"
+            className="select"
+            value={project.stageId}
+            disabled={busy}
+            onChange={(event) => onMoveToStage(event.target.value)}
+          >
+            {stages.map((stage) => (
+              <option key={stage.id} value={stage.id}>
+                {stage.name}
+              </option>
+            ))}
+          </select>
+
+          {project.nextStageId ? (
+            <button
+              type="button"
+              className="btn-stage-next"
+              onClick={() => project.nextStageId && onMoveToStage(project.nextStageId)}
+              disabled={busy}
+            >
+              Move to {project.nextStageName} →
+            </button>
+          ) : (
+            <div className="hint hint--center">This project is complete.</div>
+          )}
+        </div>
 
         <div>
           <div className="section-title">Payments</div>

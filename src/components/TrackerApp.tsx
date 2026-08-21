@@ -251,14 +251,13 @@ export function TrackerApp({ settings, stages, projects, metrics }: Props) {
       {drawerProject ? (
         <ProjectDrawer
           project={drawerProject}
+          stages={stages}
           currency={settings.currency}
           busy={isPending}
           onClose={() => setDrawerProjectId(null)}
           onEdit={() => setFormState({ mode: "edit", project: drawerProject })}
           onDelete={() => setDeleteTarget(drawerProject)}
-          onMoveNext={() =>
-            drawerProject.nextStageId && moveToStage(drawerProject, drawerProject.nextStageId)
-          }
+          onMoveToStage={(stageId) => moveToStage(drawerProject, stageId)}
           onAddPayment={(payment) => run(() => api.addPayment(drawerProject.id, payment))}
           onDeletePayment={(paymentId) => run(() => api.deletePayment(drawerProject.id, paymentId))}
           onSaveNotes={(notes) => run(() => api.updateProject(drawerProject.id, { notes }))}

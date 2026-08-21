@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { useDialogFocus } from "@/lib/useDialogFocus";
 
 interface Props {
   title: string;
@@ -20,6 +22,8 @@ export function ConfirmDialog({
   onCancel,
 }: Props) {
   const [working, setWorking] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(panelRef);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -30,7 +34,14 @@ export function ConfirmDialog({
   }, [onCancel]);
 
   return (
-    <div className="modal modal--confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div
+      ref={panelRef}
+      tabIndex={-1}
+      className="modal modal--confirm"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="confirm-title"
+    >
       <div className="modal-title modal-title--sm" id="confirm-title">
         {title}
       </div>

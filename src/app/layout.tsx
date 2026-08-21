@@ -1,9 +1,27 @@
 import type { Metadata, Viewport } from "next";
+import { Inter, Lora } from "next/font/google";
 import { TRACKER_CONFIG } from "@/config/tracker.config";
 import { getAppSettings } from "@/lib/server/settings";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
+
+/* next/font downloads these at build time and serves them from the app itself.
+   The stylesheet used to @import them from fonts.googleapis.com, which meant a
+   packaged desktop app with no internet silently fell back to system fonts —
+   and paid a render-blocking round trip when it did have some. Both are
+   variable fonts, so no weight list is needed: the whole axis ships. */
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-lora",
+  display: "swap",
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getAppSettings();
@@ -38,7 +56,7 @@ const themeBootstrap = `
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${lora.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
       </head>

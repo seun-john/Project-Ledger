@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TRACKER_CONFIG } from "@/config/tracker.config";
 import { moneyInputStep, toMajor } from "@/lib/money";
+import { useDialogFocus } from "@/lib/useDialogFocus";
 import type { CurrencySettings, ProjectDTO, StageDTO } from "@/lib/types";
 
 export interface ProjectFormValues {
@@ -29,6 +30,9 @@ interface Props {
 }
 
 export function ProjectFormModal({ mode, project, stages, currency, onSubmit, onCancel }: Props) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(panelRef);
+
   const [values, setValues] = useState(() => ({
     clientName: project?.clientName ?? "",
     clientContact: project?.clientContact ?? "",
@@ -67,7 +71,14 @@ export function ProjectFormModal({ mode, project, stages, currency, onSubmit, on
   };
 
   return (
-    <div className="modal modal--form" role="dialog" aria-modal="true" aria-labelledby="project-form-title">
+    <div
+      ref={panelRef}
+      tabIndex={-1}
+      className="modal modal--form"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="project-form-title"
+    >
       <div className="modal-title" id="project-form-title">
         {mode === "add" ? "New project" : "Edit project"}
       </div>
