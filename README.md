@@ -81,6 +81,7 @@ The demo records use labels such as “Sample Client A” and email addresses un
 | `npm run db:studio` | Open Prisma’s local database browser |
 | `npm run electron:dev` | Start the app in a standalone Electron desktop window |
 | `npm run electron:build` | Build Next.js and package into a `.exe` Windows installer |
+| `npm run db:template` | Build only `prisma/prod.db`, the database new installs start from |
 
 ## Local data and backups
 
@@ -109,6 +110,8 @@ To build the Windows `.exe` installer:
 2. Run `npm run electron:build`.
 
 This command builds the Next.js app, packages Prisma engines, bundles an initial SQLite database, and creates an NSIS Windows installer in the `dist/` directory.
+
+`prisma/prod.db` is the database every new installation starts from. It is not in Git — it can hold real client data — so the build creates it from the schema and the default stages when it is missing. Nothing to prepare by hand on a fresh clone.
 
 When a user runs the installer, the application is installed like a native program and places a shortcut in the Start Menu and Desktop. On its first launch, it copies the initial database to the user's writable application data folder (`%APPDATA%/project-ledger`). This ensures the app works perfectly without requiring administrative privileges to modify files in `Program Files`.
 
