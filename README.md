@@ -19,15 +19,6 @@ The app is white-label by design: a first-run setup screen lets each installatio
 - Local SQLite storage with no hosted account required
 - Optional fictional demo data using reserved `example.invalid` addresses
 
-## Screenshots
-
-Screenshots are intentionally left as placeholders until the public release is styled and populated with final demo data.
-
-| View | Preview |
-| --- | --- |
-| Pipeline dashboard | `docs/screenshots/dashboard.png` — add before publishing the repository |
-| White-label settings | `docs/screenshots/settings.png` — add before publishing the repository |
-
 ## Tech stack
 
 - Next.js 15 and React 19
@@ -46,8 +37,8 @@ Screenshots are intentionally left as placeholders until the public release is s
 ## Quick start
 
 ```bash
-git clone <your-repository-url>
-cd ConsultTrack
+git clone https://github.com/seun-john/Project-Ledger.git
+cd Project-Ledger
 cp .env.example .env
 npm install
 npm run setup
